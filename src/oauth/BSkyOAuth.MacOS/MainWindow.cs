@@ -10,7 +10,7 @@ namespace BSkyOAuth;
 /// <summary>
 /// Main Window.
 /// </summary>
-public class MainWindow : NSWindow
+public sealed class MainWindow : NSWindow
 {
     private const string ClientMetadataUrl = "https://drasticactions.vip/client-metadata.json";
 
@@ -47,27 +47,21 @@ public class MainWindow : NSWindow
         };
 
         this.authButton.Activated += this.AuthButton_TouchUpInside;
-
-        this.ContentView!.AddSubview(this.handleField);
-        this.ContentView!.AddSubview(this.authButton);
+        var view = new NSView();
+        this.ContentView = view;
+        view.AddSubview(this.handleField);
+        view.AddSubview(this.authButton);
 
         this.handleField.TranslatesAutoresizingMaskIntoConstraints = false;
-        this.handleField.AddConstraints(new[]
-        {
-            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, this.ContentView, NSLayoutAttribute.Leading, 1, 10),
-            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, this.ContentView, NSLayoutAttribute.Trailing, 1, -10),
-            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this.ContentView, NSLayoutAttribute.Top, 1, 10),
-            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1, 30),
-        });
-
         this.authButton.TranslatesAutoresizingMaskIntoConstraints = false;
-        this.authButton.AddConstraints(new[]
-        {
-            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, this.ContentView, NSLayoutAttribute.Leading, 1, 10),
-            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, this.ContentView, NSLayoutAttribute.Trailing, 1, -10),
-            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this.handleField, NSLayoutAttribute.Bottom, 1, 10),
-            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1, 30),
-        });
+        this.handleField.TopAnchor.ConstraintEqualTo(view.TopAnchor, 10).Active = true;
+        this.handleField.LeadingAnchor.ConstraintEqualTo(view.LeadingAnchor, 10).Active = true;
+        this.handleField.TrailingAnchor.ConstraintEqualTo(view.TrailingAnchor, -10).Active = true;
+        this.handleField.HeightAnchor.ConstraintEqualTo(30).Active = true;
+        this.authButton.TopAnchor.ConstraintEqualTo(this.handleField.BottomAnchor, 10).Active = true;
+        this.authButton.LeadingAnchor.ConstraintEqualTo(view.LeadingAnchor, 10).Active = true;
+        this.authButton.TrailingAnchor.ConstraintEqualTo(view.TrailingAnchor, -10).Active = true;
+        this.authButton.HeightAnchor.ConstraintEqualTo(30).Active = true;
     }
 
     private async void AuthButton_TouchUpInside(object? sender, EventArgs e)
