@@ -15,8 +15,6 @@ public sealed class LoginViewController : UIViewController
 
     private const string RedirectUri = "vip.drasticactions:/callback";
 
-    private const string InstanceUri = "https://bsky.social";
-
     private readonly OAuthManager oauthManager;
 
     private ATProtocol atProtocol;
