@@ -4,6 +4,7 @@
 
 using BSkyOAuth;
 using FishyFlip;
+using FishyFlip.Models;
 
 /// <summary>
 /// Login View Controller.
@@ -14,11 +15,15 @@ public sealed class LoginViewController : UIViewController
 
     private const string RedirectUri = "vip.drasticactions:/callback";
 
+    private const string InstanceUri = "https://bsky.social";
+
     private readonly OAuthManager oauthManager;
 
     private ATProtocol atProtocol;
 
     private UIButton authButton;
+
+    private UITextField handleField;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginViewController"/> class.
@@ -35,19 +40,62 @@ public sealed class LoginViewController : UIViewController
         this.authButton.TouchUpInside += this.AuthButton_TouchUpInside;
         this.View!.AddSubview(this.authButton);
 
+        this.handleField = new UITextField();
+        this.handleField.Placeholder = "Handle";
+
+        this.View!.AddSubview(this.handleField);
+        this.handleField.TranslatesAutoresizingMaskIntoConstraints = false;
+
+        this.View!.AddConstraints(new[]
+        {
+            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this.View!, NSLayoutAttribute.Top, 1, 100),
+            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, this.View!, NSLayoutAttribute.Leading, 1, 20),
+            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, this.View!, NSLayoutAttribute.Trailing, 1, -20),
+            NSLayoutConstraint.Create(this.handleField, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1, 40),
+        });
+
         this.authButton.TranslatesAutoresizingMaskIntoConstraints = false;
-        this.authButton.CenterXAnchor.ConstraintEqualTo(this.View!.CenterXAnchor).Active = true;
-        this.authButton.CenterYAnchor.ConstraintEqualTo(this.View!.CenterYAnchor).Active = true;
+        this.View!.AddConstraints(new[]
+        {
+            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Top, NSLayoutRelation.Equal, this.handleField, NSLayoutAttribute.Bottom, 1, 20),
+            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Leading, NSLayoutRelation.Equal, this.View!, NSLayoutAttribute.Leading, 1, 20),
+            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Trailing, NSLayoutRelation.Equal, this.View!, NSLayoutAttribute.Trailing, 1, -20),
+            NSLayoutConstraint.Create(this.authButton, NSLayoutAttribute.Height, NSLayoutRelation.Equal, 1, 40),
+        });
     }
 
     private async void AuthButton_TouchUpInside(object? sender, EventArgs e)
     {
-        var uri = await this.atProtocol.GenerateOAuth2AuthenticationUrlAsync(
+        if (!ATIdentifier.TryCreate(this.handleField.Text, out ATIdentifier? atIdentifier))
+        {
+            this.InvokeOnMainThread(() =>
+            {
+                var alert = UIAlertController.Create("Error", "Invalid handle", UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+                this.PresentViewController(alert, true, null);
+            });
+
+            return;
+        }
+
+        var (uri, error) = await this.atProtocol.GenerateOAuth2AuthenticationUrlResultAsync(
             ClientMetadataUrl,
             RedirectUri,
             new[] { "atproto" },
-            null,
-            null);
+            atIdentifier!);
+
+        if (error != null)
+        {
+            this.InvokeOnMainThread(() =>
+            {
+                var alert = UIAlertController.Create("Error", error.ToString(), UIAlertControllerStyle.Alert);
+                alert.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+                this.PresentViewController(alert, true, null);
+            });
+
+            return;
+        }
+
         this.oauthManager.StartAuthentication(uri!);
     }
 
@@ -65,7 +113,7 @@ public sealed class LoginViewController : UIViewController
             if (parameters.TryGetValue("code", out string? code))
             {
                 // If we got a code, we can complete the authentication process.
-                var session = await this.atProtocol.AuthenticateWithOAuth2CallbackAsync(callbackUrl.ToString());
+                var (session, error) = await this.atProtocol.AuthenticateWithOAuth2CallbackResultAsync(callbackUrl.ToString());
                 if (session != null)
                 {
                     // We have a session!
