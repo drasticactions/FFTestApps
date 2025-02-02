@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Post DM",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_dmbot",
+            "program": "${workspaceFolder}/src/console/dmbot/bin/Debug/net9.0/dmbot.dll",
+            "args": [ 
+                "dm",
+                "Testing ホゲ, etc",
+                "-id",
+                "drasticactions.xn--q9jyb4c",
+                "-r",
+                "at://did:plc:okblbaji7rz243bluudjlgxt/app.bsky.feed.post/3lc2xksbvhw2f",
+                "-c",
+                "bafyreicwud4br5p54vikac7bprpszbca2jjc5ysjkszhtmextdrhgbozoa",
+                "-u",
+                "${env:BLUESKY_DM_TEST_HANDLE}",
+                "-p",
+                "${env:BLUESKY_DM_TEST_PASSWORD}" ],
+            "cwd": "${workspaceFolder}/src/console/dmbot/bin/Debug/net9.0/",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach"
+        }
+    ]
+}
