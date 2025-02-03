@@ -2,6 +2,43 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Random",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_randombot",
+            "program": "${workspaceFolder}/src/console/randombot/bin/Debug/net9.0/randombot.dll",
+            "args": [ 
+                "random",
+                "${workspaceFolder}/../larry.txt",
+                "-u",
+                "${env:BLUESKY_DM_TEST_HANDLE}",
+                "-p",
+                "${env:BLUESKY_DM_TEST_PASSWORD}" ],
+            "cwd": "${workspaceFolder}/src/console/randombot/bin/Debug/net9.0/",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
+            "name": "Random Reply",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_randombot",
+            "program": "${workspaceFolder}/src/console/randombot/bin/Debug/net9.0/randombot.dll",
+            "args": [ 
+                "random",
+                "reply",
+                "${workspaceFolder}/../larry.txt",
+                "-id",
+                "drasticactions.xn--q9jyb4c",
+                "-u",
+                "${env:BLUESKY_DM_TEST_HANDLE}",
+                "-p",
+                "${env:BLUESKY_DM_TEST_PASSWORD}" ],
+            "cwd": "${workspaceFolder}/src/console/randombot/bin/Debug/net9.0/",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+        {
             "name": "Post DM",
             "type": "coreclr",
             "request": "launch",
